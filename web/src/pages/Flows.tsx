@@ -52,7 +52,7 @@ export default function Flows() {
 
   return (
     <div className="space-y-8">
-      <PageHead eyebrow="USDC on the sidelines" title="Flows"
+      <PageHead title="Flows"
         desc="How much USDC smart and whale wallets are sitting on, and which tokens they rotate out of and into." />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -63,7 +63,7 @@ export default function Flows() {
       </div>
 
       <Panel className="rise" style={{ '--i': 4 } as CSSProperties} title="USDC balance by category"
-        sub="Dry powder waiting in tracked wallets. Fomo wallets are left out: fomo.family only bridges USDC to Arc at the moment of a buy."
+        sub="USDC held by tracked wallets. Fomo wallets are left out: fomo.family only bridges USDC to Arc at the moment of a buy."
         right={<Seg<RangeKey> label="Range" size="sm" value={range} onChange={setRange} options={RANGES} />}>
         {pts.length >= 2 ? <LineChart key={range} pts={pts} /> : (
           <Status loading={series.loading} error={series.error}

@@ -198,7 +198,7 @@ function WindowCards({ r, win, loading }: { r: BoardRow | undefined; win: WinKey
 
       <Card className="rise p-6" style={{ '--i': 5 } as CSSProperties}>
         <div className="flex items-center gap-1.5 text-xs font-medium text-ink-3">
-          Who holds it <Hint text="Tracked wallets holding this token now, by category" />
+          Holders <Hint text="Tracked wallets holding this token now, by category" />
         </div>
         <div className="mt-4 flex items-center gap-6">
           <Donut counts={mix} size={132}>
@@ -250,8 +250,8 @@ function Ladder({ by, counts, win, onWin, loading, error }: {
   const maxNet = Math.max(0, ...WINDOWS.map(w => Math.abs(by.get(`${w.key}|${cat}`)?.net ?? 0)));
 
   return (
-    <Panel className="rise" style={{ '--i': 6 } as CSSProperties} title="Every window at a glance"
-      sub="Short windows show what is happening now, long ones show the trend. Click a row to switch the window."
+    <Panel className="rise" style={{ '--i': 6 } as CSSProperties} title="By time window"
+      sub="Click a row to switch the window."
       right={<Seg<CatAll> label="Category" size="sm" value={cat} onChange={setCat} options={CATS} />}>
       <div className="scroll-thin overflow-x-auto">
         <table className="w-full text-sm">

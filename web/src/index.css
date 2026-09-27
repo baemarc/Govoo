@@ -24,6 +24,7 @@
 
 html { color-scheme: dark; }
 html, body { overflow-x: clip; }
+button:not(:disabled), summary, [role="radio"], [role="button"] { cursor: pointer; }
 body {
   background: var(--color-bg);
   color: var(--color-ink);
@@ -140,7 +141,6 @@ body {
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes ping { 0% { transform: scale(.6); opacity: .7; } 100% { transform: scale(2.4); opacity: 0; } }
-@keyframes sonar { 0% { transform: scale(.2); opacity: 0; } 15% { opacity: .5; } 100% { transform: scale(1); opacity: 0; } }
 @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes dash { to { stroke-dashoffset: -16; } }
@@ -150,7 +150,6 @@ body {
 .fade-in { animation: fade .4s ease both; }
 .grow { transform-origin: var(--origin, left); animation: grow .8s var(--ease-out-soft) both; animation-delay: calc(120ms + var(--i, 0) * 35ms); }
 .ping { animation: ping 1.8s cubic-bezier(0, 0, .2, 1) infinite; }
-.sonar { animation: sonar 4.5s cubic-bezier(.2, .6, .3, 1) infinite; }
 .open { animation: open .3s var(--ease-out-soft) both; }
 .shimmer {
   background: linear-gradient(90deg, rgb(255 255 255 / .03) 25%, rgb(255 255 255 / .07) 50%, rgb(255 255 255 / .03) 75%);
@@ -162,5 +161,5 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
-  .ping, .sonar, .flowing { animation: none !important; }
+  .ping, .flowing { animation: none !important; }
 }

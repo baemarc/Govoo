@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { configured, sb } from './lib/supabase';
 import { must } from './lib/data';
@@ -19,13 +20,14 @@ const nav = [
 
 export default function App() {
   const loc = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [loc.pathname]);
   return (
     <div className="relative flex min-h-screen flex-col">
       <div className="backdrop" aria-hidden />
       <header className="sticky top-0 z-40 border-b border-white/[0.05] bg-bg/60 backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:gap-8 sm:px-6">
-          <NavLink to="/" className="flex items-center gap-2.5">
-            <SonarMark live className="size-8" />
+          <NavLink to="/" className="flex items-center gap-3">
+            <SonarMark className="size-8" />
             <span className="hidden text-[17px] font-semibold tracking-[-0.03em] sm:inline">Sonarc</span>
           </NavLink>
           <nav className="flex gap-0.5 sm:gap-1">
@@ -62,7 +64,7 @@ export default function App() {
       </main>
       <footer className="border-t border-white/[0.05]">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-ink-3 sm:px-6">
-          <span className="flex items-center gap-2"><SonarMark className="size-5" /> Sonarc · Smart money flow on Arc</span>
+          <span className="flex items-center gap-2.5"><SonarMark className="size-5" /> Sonarc · Tracked wallet flows on Arc</span>
           <span>Refreshes every 5 minutes · Not financial advice</span>
         </div>
       </footer>
@@ -83,7 +85,7 @@ function Live() {
         {fresh && <span className="ping absolute inset-0 rounded-full bg-up" />}
         <span className={`relative size-1.5 rounded-full ${fresh ? 'bg-up' : 'bg-down'}`} />
       </span>
-      <span className="hidden sm:inline">Synced</span> <span className="num">{ago(at)}</span>
+      <span className="hidden sm:inline">Updated</span> <span className="num">{ago(at)}</span>
     </span>
   );
 }

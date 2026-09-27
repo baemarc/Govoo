@@ -238,23 +238,10 @@ export function Panel({ title, sub, right, children, className = '', style }: {
   );
 }
 
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.03] py-1 pl-2.5 pr-3 text-[11px] font-medium tracking-wide text-ink-2 backdrop-blur">
-      <span className="relative flex size-1.5">
-        <span className="ping absolute inset-0 rounded-full bg-accent" />
-        <span className="relative size-1.5 rounded-full bg-accent" />
-      </span>
-      {children}
-    </div>
-  );
-}
-
-export function PageHead({ eyebrow, title, desc, right }: { eyebrow?: ReactNode; title: ReactNode; desc?: ReactNode; right?: ReactNode }) {
+export function PageHead({ title, desc, right }: { title: ReactNode; desc?: ReactNode; right?: ReactNode }) {
   return (
     <div className="rise flex flex-wrap items-end justify-between gap-6">
       <div className="max-w-2xl">
-        {eyebrow && <div className="mb-4"><Eyebrow>{eyebrow}</Eyebrow></div>}
         <h1 className="text-grad pb-1 text-[32px] font-semibold leading-[1.05] tracking-[-0.04em] sm:text-[44px]">{title}</h1>
         {desc && <p className="mt-3 text-[15px] leading-relaxed text-ink-3">{desc}</p>}
       </div>
@@ -320,20 +307,19 @@ export function Status({ loading, error, empty, rows = 5 }: { loading?: boolean;
   return null;
 }
 
-export function SonarMark({ className = '', live = false }: { className?: string; live?: boolean }) {
+export function SonarMark({ className = '' }: { className?: string }) {
   return (
-    <span className={`relative inline-grid place-items-center ${className}`}>
-      {live && [0, 1.5, 3].map(d => (
-        <span key={d} className="sonar absolute inset-[-40%] rounded-full border border-accent/40" style={{ animationDelay: `${d}s` }} aria-hidden />
-      ))}
-      <svg viewBox="0 0 32 32" className="relative size-full" aria-hidden>
-        <defs><linearGradient id="sm-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5eead4" /><stop offset="1" stopColor="#818cf8" /></linearGradient></defs>
-        <rect width="32" height="32" rx="9" fill="#0b0d13" />
-        <path d="M5.5 22a10.5 10.5 0 0 1 21 0" fill="none" stroke="url(#sm-g)" strokeWidth={2.4} strokeLinecap="round" opacity=".45" />
-        <path d="M10.5 22a5.5 5.5 0 0 1 11 0" fill="none" stroke="url(#sm-g)" strokeWidth={2.4} strokeLinecap="round" opacity=".8" />
-        <circle cx="16" cy="22" r="2.4" fill="#5eead4" />
-      </svg>
-    </span>
+    <svg viewBox="0 0 32 32" className={className} aria-hidden>
+      <defs>
+        <linearGradient id="sm-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5eead4" /><stop offset="1" stopColor="#818cf8" /></linearGradient>
+        <radialGradient id="sm-sweep" cx="16" cy="16" r="11" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#5eead4" stopOpacity="0" /><stop offset="1" stopColor="#5eead4" stopOpacity=".55" /></radialGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="#10131b" />
+      <circle cx="16" cy="16" r="11" fill="none" stroke="url(#sm-ring)" strokeWidth={2} />
+      <circle cx="16" cy="16" r="5.5" fill="none" stroke="url(#sm-ring)" strokeWidth={1.6} opacity=".45" />
+      <path d="M16 16L16 5A11 11 0 0 1 26.4 12.4Z" fill="url(#sm-sweep)" />
+      <circle cx="21.5" cy="10" r="2" fill="#5eead4" />
+    </svg>
   );
 }
 

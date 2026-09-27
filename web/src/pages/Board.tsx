@@ -103,9 +103,8 @@ export default function Board() {
 
   return (
     <div className="space-y-8">
-      <PageHead eyebrow="Live on Arc mainnet"
-        title={<>Follow the <span className="text-brand">smart money</span></>}
-        desc="Which tokens tracked wallets are buying and selling, how many of them hold each one, and how much USDC moved."
+      <PageHead title="Flow Board"
+        desc="Which tokens tracked wallets bought and sold on Arc, how many of them hold each one, and how much USDC moved."
         right={
           <div className="flex w-full min-w-0 flex-col items-start gap-2 sm:w-auto sm:items-end">
             <Seg<WinKey> label="Time window" value={win} onChange={v => set('w', v, '24h')}
@@ -121,7 +120,7 @@ export default function Board() {
 
       <Panel className="rise" style={{ '--i': 3 } as CSSProperties}
         title={<span className="flex items-center gap-2">All tokens <span className="num rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-medium text-ink-2">{view.length}</span></span>}
-        sub={<>Click a row to see who is in it. Sorted by <span className="text-ink-2">{SORTS.find(s => s.key === sort)!.label.toLowerCase()}</span>, {winLabel} window.</>}
+        sub={<>Click a row for details. Sorted by <span className="text-ink-2">{SORTS.find(s => s.key === sort)!.label.toLowerCase()}</span>, {winLabel} window.</>}
         right={
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <div className="md:hidden"><Seg<SortKey> label="Sort" size="sm" value={sort} onChange={v => set('s', v, 'net')} options={SORTS} /></div>
@@ -283,7 +282,7 @@ function Pulse({ rows, loading, winLabel }: { rows: BoardRow[]; loading: boolean
     <Card glow className="rise flex flex-col p-6 lg:col-span-5" style={{ '--i': 1 } as CSSProperties}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 text-xs font-medium text-ink-3">
-          Market pulse · {winLabel}
+          Buy / sell balance · {winLabel}
           <Hint text="Share of tracked-wallet USDC volume that went into buying. Above 50% means more buying than selling." />
         </div>
         <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
@@ -365,7 +364,7 @@ function Leaders({ rows, tokens, loading, holderWin, winLabel }: {
     <Card className="rise flex flex-col p-6 lg:col-span-7" style={{ '--i': 2 } as CSSProperties}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-[15px] font-semibold tracking-tight">Leaders</h2>
+          <h2 className="text-[15px] font-semibold tracking-tight">Top tokens</h2>
           <p className="mt-1 text-xs text-ink-3">{desc}</p>
         </div>
         <Seg<LeaderKey> label="Leaderboard" size="sm" value={tab} onChange={setTab} options={LEADER_TABS} />
@@ -520,7 +519,7 @@ function Legend() {
         </span>
       </summary>
       <dl className="open mt-4 grid gap-x-10 gap-y-3 border-t border-white/[0.05] pt-4 leading-relaxed sm:grid-cols-2">
-        <Def t="Market pulse">Share of USDC volume that went into buying. 50% means buying and selling were equal.</Def>
+        <Def t="Buy / sell balance">Share of USDC volume that went into buying. 50% means buying and selling were equal.</Def>
         <Def t="Net flow">USDC spent buying minus USDC received selling. The bar compares it with the biggest mover on the list.</Def>
         <Def t="Buyers · Sellers">Distinct tracked wallets that bought or sold. Green is buyers, red is sellers.</Def>
         <Def t="Holders">Tracked wallets holding the token now. The colored bar is the Smart / Whale / Fomo mix. Change shows on 4h · 12h · 24h · 1w · 1M.</Def>
