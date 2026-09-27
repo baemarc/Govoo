@@ -61,7 +61,7 @@ function Login() {
     if (error) setErr(error.message);
   }
   return (
-    <form onSubmit={submit} className="mx-auto mt-16 max-w-sm space-y-3 rounded-lg border border-line bg-surface p-6">
+    <form onSubmit={submit} className="mx-auto mt-16 max-w-sm space-y-3 rounded-2xl border border-line bg-surface p-6">
       <h1 className="text-lg font-semibold">Admin sign in</h1>
       <Input value={email} onChange={setEmail} placeholder="Email" type="email" autoComplete="username" />
       <Input value={password} onChange={setPassword} placeholder="Password" type="password" autoComplete="current-password" />
@@ -108,7 +108,7 @@ function Wallets({ reqRev }: { reqRev: number }) {
             {reqs.data.map(r => (
               <li key={r.id} className="flex items-center gap-2">
                 <span className={r.action === 'remove' ? 'text-down' : 'text-up'}>{r.action}</span>
-                <span className="num text-ink-2">{r.address}</span>
+                <span className="mono text-ink-2">{r.address}</span>
                 {r.category && <CatTag c={r.category} />}
                 <span className="text-ink-3">{r.label}</span>
                 <button className="ml-auto text-ink-3 hover:text-down" title="Cancel request"
@@ -143,7 +143,7 @@ function Wallets({ reqRev }: { reqRev: number }) {
                     <span className="max-w-32 truncate text-ink-2">{w.label ?? w.pub?.label ?? ''}</span>
                   </div>
                 </td>
-                <td className={`${td} num text-xs`}>
+                <td className={`${td} mono text-xs`}>
                   <a href={`https://arcexplorer.org/address/${w.address}`} target="_blank" rel="noreferrer" className="text-ink-2 hover:text-ink">{w.address}</a>
                 </td>
                 <td className={`${td} text-xs text-ink-3`}>{w.source}</td>
@@ -186,8 +186,8 @@ function AddWallet({ onDone, restore, onCancel }: { onDone: () => void; restore?
       <div className="flex flex-wrap items-center gap-2">
         <Seg<Cat> label="New wallet category" value={cat} onChange={setCat} options={CAT_OPTS} />
         {restore
-          ? <span className="num flex-1 text-xs text-ink-2">{restore}</span>
-          : <Input value={address} onChange={setAddress} placeholder="0x… address" className="num min-w-72 flex-1" />}
+          ? <span className="mono flex-1 text-xs text-ink-2">{restore}</span>
+          : <Input value={address} onChange={setAddress} placeholder="0x… address" className="mono min-w-72 flex-1" />}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {cat === 'fomo' && <>
@@ -221,7 +221,7 @@ function WhaleTokens() {
   return (
     <Panel title="Whale token list">
       <form onSubmit={add} className="flex flex-wrap gap-2 border-b border-line px-4 py-3">
-        <Input value={addr} onChange={setAddr} placeholder="Token address" className="num min-w-64 flex-1" />
+        <Input value={addr} onChange={setAddr} placeholder="Token address" className="mono min-w-64 flex-1" />
         <Input value={sym} onChange={setSym} placeholder="Symbol" className="w-28" />
         <Button disabled={!ADDR.test(addr.trim())}>Add</Button>
       </form>
@@ -232,7 +232,7 @@ function WhaleTokens() {
         <tbody className="divide-y divide-line/60">
           {list.data?.map(w => (
             <tr key={w.token}>
-              <td className={td}><span className="font-medium">{w.symbol ?? '—'}</span> <span className="num text-xs text-ink-3">{w.token}</span></td>
+              <td className={td}><span className="font-medium">{w.symbol ?? '—'}</span> <span className="mono text-xs text-ink-3">{w.token}</span></td>
               <td className={`${td} text-xs text-ink-3`}>{w.last_scanned_at ? ago(w.last_scanned_at) : 'never'}</td>
               <td className={`${td} num text-right`}>{w.whale_count}</td>
               <td className={td}><RemoveBtn onClick={async () => {
@@ -266,7 +266,7 @@ function TokenBlacklist() {
   return (
     <Panel title={<>Removed tokens <span className="font-normal text-ink-3">· {list.data?.length ?? 0}</span></>}>
       <form onSubmit={add} className="flex flex-wrap gap-2 border-b border-line px-4 py-3">
-        <Input value={addr} onChange={setAddr} placeholder="Token address" className="num min-w-64 flex-1" />
+        <Input value={addr} onChange={setAddr} placeholder="Token address" className="mono min-w-64 flex-1" />
         <Input value={reason} onChange={setReason} placeholder="Reason" className="w-36" />
         <Button disabled={!ADDR.test(addr.trim())}>Remove token</Button>
       </form>
@@ -303,7 +303,7 @@ function ListTable({ rows, label, onRestore }: { rows: Listed[] | undefined; lab
             <tr key={r.address}>
               <td className={td}>
                 {label(r.address) && <span className="mr-2 font-medium">{label(r.address)}</span>}
-                <span className="num text-xs text-ink-3">{r.address}</span>
+                <span className="mono text-xs text-ink-3">{r.address}</span>
               </td>
               <td className={`${td} text-xs text-ink-3`}>{r.reason ?? ''}</td>
               <td className={`${td} text-xs text-ink-3`}>{ago(r.added_at)}</td>
