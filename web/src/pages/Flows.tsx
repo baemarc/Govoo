@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { sb } from '../lib/supabase';
-import { fetchAll, tokenMap } from '../lib/data';
+import { fetchAll, tokensFor } from '../lib/data';
 import { useAsync } from '../lib/useAsync';
 import type { Cat, Rotation } from '../lib/types';
 import { WINDOWS, labelOf, winOf, type WinKey } from '../lib/windows';
@@ -37,9 +37,13 @@ export default function Flows() {
     return [...by.values()].sort((a, b) => a.t - b.t);
   }, [range]);
 
-  const rot = useAsync(async () => fetchAll<Rotation>(() =>
-    sb.from('rotations').select('*').eq('win', win).order('usd', { ascending: false }).order('from_token').order('to_token')), [win]);
-  const tokens = useAsync(tokenMap, []);
+  const rotRes = useAsync(async () => {
+    const data = await fetchAll<Rotation>(() =>
+      sb.from('rotations').select('*').eq('win', win).order('usd', { ascending: false }).order('from_token').order('to_token'));
+    return { data, tokens: await tokensFor(data.flatMap(r => [r.from_token, r.to_token])) };
+  }, [win]);
+  const rot = { data: rotRes.data?.data, loading: rotRes.loading, error: rotRes.error };
+  const tokens = { data: rotRes.data?.tokens };
 
   const pts = series.data ?? [];
   const last = pts[pts.length - 1];

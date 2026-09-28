@@ -20,6 +20,21 @@ export async function must<T>(p: Res<T>): Promise<T | null> {
   return data;
 }
 
+const tokenCache = new Map<string, Token | null>();
+export async function tokensFor(addrs: string[]): Promise<Map<string, Token>> {
+  const miss = [...new Set(addrs)].filter(a => !tokenCache.has(a));
+  const chunks: string[][] = [];
+  for (let i = 0; i < miss.length; i += 100) chunks.push(miss.slice(i, i + 100));
+  await Promise.all(chunks.map(async c => {
+    const rows = (await must(sb.from('tokens').select('*').in('address', c))) as Token[] | null;
+    const got = new Map((rows ?? []).map(t => [t.address, t]));
+    for (const a of c) tokenCache.set(a, got.get(a) ?? null);
+  }));
+  const out = new Map<string, Token>();
+  for (const a of addrs) { const t = tokenCache.get(a); if (t) out.set(a, t); }
+  return out;
+}
+
 let tokensP: Promise<Map<string, Token>> | null = null;
 export function tokenMap(): Promise<Map<string, Token>> {
   tokensP ??= fetchAll<Token>(() => sb.from('tokens').select('*').order('address'))
