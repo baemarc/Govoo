@@ -53,14 +53,6 @@ export default function About() {
         </ol>
       </Panel>
 
-      <Panel className="rise" style={{ '--i': 9 } as CSSProperties} title="Data sources">
-        <div className="space-y-3 border-t border-white/[0.05] px-5 py-5 text-sm leading-relaxed text-ink-2">
-          <p>Trades come from Arc mainnet logs. Prices, market cap and liquidity come from DexScreener, and total holder counts from the Arc explorer (every 4 hours).</p>
-          <p>History starts at Arc mainnet launch, 16 September 2026. Data refreshes every 5 minutes; there is no live stream.</p>
-          <p>Tokens can be removed by the maintainers (spam or scams). A removed token disappears everywhere and its data stops being collected.</p>
-        </div>
-      </Panel>
-
       <p className="text-xs text-ink-3">Nothing here is financial advice. Sonarc is a statistics tool, not a signal service.</p>
     </div>
   );

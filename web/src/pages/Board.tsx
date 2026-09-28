@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { sb } from '../lib/supabase';
-import { fetchAll, must, tokenMap } from '../lib/data';
+import { fetchAll, must, tokensFor } from '../lib/data';
 import { useAsync } from '../lib/useAsync';
 import { useAdmin } from '../lib/useAdmin';
 import { useFlip } from '../lib/motion';
@@ -56,9 +56,13 @@ export default function Board() {
     setOpen(null);
   };
 
-  const rows = useAsync(() => fetchAll<BoardRow>(() =>
-    sb.from('board_rows').select('*').eq('win', win).eq('category', cat).order('token')), [win, cat]);
-  const tokens = useAsync(tokenMap, []);
+  const res = useAsync(async () => {
+    const data = await fetchAll<BoardRow>(() =>
+      sb.from('board_rows').select('*').eq('win', win).eq('category', cat).order('token'));
+    return { data, tokens: await tokensFor(data.map(r => r.token)) };
+  }, [win, cat]);
+  const rows = { data: res.data?.data, loading: res.loading, error: res.error };
+  const tokens = { data: res.data?.tokens };
 
   const all = useMemo(() => (rows.data ?? []).filter(r => !removed.has(r.token)), [rows.data, removed]);
 
@@ -246,7 +250,7 @@ export default function Board() {
           </div>
         )}
 
-        <Status loading={loading} error={rows.error ?? tokens.error} rows={8}
+        <Status loading={loading} error={rows.error} rows={8}
           empty={!rows.loading && !view.length ? (q ? 'No token matches your search.' : 'No tracked-wallet trades in this window.') : undefined} />
         <div className="h-2" />
       </Panel>

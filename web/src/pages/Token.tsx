@@ -1,7 +1,7 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { sb } from '../lib/supabase';
-import { must, tokenMap, walletMap } from '../lib/data';
+import { must, tokensFor, walletMap } from '../lib/data';
 import { useAsync } from '../lib/useAsync';
 import type { BoardRow, Cat, CatAll, Position, Token, Trade } from '../lib/types';
 import { CATS, HOLDER_WINDOWS, WINDOWS, labelOf, secsOf, winOf, type WinKey } from '../lib/windows';
@@ -24,8 +24,7 @@ export default function TokenPage() {
     setParams(p, { replace: true });
   };
 
-  const token = useAsync(async () => (await tokenMap()).get(address)
-    ?? (await must(sb.from('tokens').select('*').eq('address', address).maybeSingle())) ?? null, [address]);
+  const token = useAsync(async () => (await tokensFor([address])).get(address) ?? null, [address]);
   const rows = useAsync(async () => (await must(sb.from('board_rows').select('*').eq('token', address))) as BoardRow[] ?? [], [address]);
   const counts = useAsync(async () => (await must(sb.from('holder_counts').select('ts, holders').eq('token', address)
     .gte('ts', new Date(Date.now() - 32 * 86_400_000).toISOString()).order('ts'))) as HolderPoint[] ?? [], [address]);
