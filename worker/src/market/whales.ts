@@ -167,7 +167,7 @@ export async function whaleRound(db: DB): Promise<{ scanned: ScanResult[]; error
     } catch (e) {
       errors++;
       db.prepare(`UPDATE whale_tokens SET scan_status = 'error', scan_error = ?, next_scan_at = ? WHERE token = ?`)
-        .run(String((e as Error)?.message ?? e), now() + RESCAN_SEC, token);
+        .run(String((e as Error)?.message ?? e), now() + (explorerDown ? EXPLORER_DOWN_RETRY_SEC : RESCAN_SEC), token);
     }
   }
   explorerDown = false;

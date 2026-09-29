@@ -198,3 +198,5 @@ begin
 end $$;
 revoke execute on function public.publish_round(jsonb, jsonb, jsonb) from public, anon, authenticated;
 grant execute on function public.publish_round(jsonb, jsonb, jsonb) to service_role;
+
+alter function public.publish_round(jsonb, jsonb, jsonb) set statement_timeout = '120s';
