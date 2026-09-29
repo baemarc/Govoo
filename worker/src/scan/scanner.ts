@@ -1,5 +1,5 @@
 import { ADDRESS_CHUNK, TRANSFER_TOPIC, USDC, USDC_MIRROR } from '../chain.js';
-import { getLogs, isRangeError, rpc, rpcBatch, type RawLog } from '../rpc.js';
+import { getLogs, isRangeError, rpcBatch, RpcError, type RawLog } from '../rpc.js';
 import { now, type DB } from '../db.js';
 import { padTopic, toLeg } from './logs.js';
 import { relayCounterparty, resolveTx, usdcTrade, type Leg, type TradeRow, type TransferRow } from './resolve.js';
@@ -101,7 +101,30 @@ const SWAP_TOPICS = new Set([
 ]);
 const V4_POOL_MANAGER = '0x8366a39cc670b4001a1121b8f6a443a643e40951';
 
-const RELAY_PARALLEL = 8;
+const RECEIPT_BATCH = 30;
+const RECEIPT_TRIES = 3;
+
+type Receipt = { logs: RawLog[] } | null | undefined;
+
+async function fetchReceipts(txs: string[]): Promise<Map<string, Receipt>> {
+  const out = new Map<string, Receipt>();
+  let todo = txs;
+  for (let attempt = 0; attempt < RECEIPT_TRIES && todo.length; attempt++) {
+    if (attempt) await new Promise(r => setTimeout(r, 2000));
+    for (let i = 0; i < todo.length; i += RECEIPT_BATCH) {
+      const part = todo.slice(i, i + RECEIPT_BATCH);
+      let res: Receipt[] = [];
+      try {
+        res = await rpcBatch<{ logs: RawLog[] } | null>('eth_getTransactionReceipt', part.map(tx => [tx]));
+      } catch (e) {
+        await new Promise(r => setTimeout(r, e instanceof RpcError && e.code === 429 ? 15_000 : 3000));
+      }
+      part.forEach((tx, j) => { if (res[j]) out.set(tx, res[j]); });
+    }
+    todo = todo.filter(tx => !out.get(tx));
+  }
+  return out;
+}
 
 export async function enrichRelays(db: DB, limit = 500, sinceTs = 0): Promise<{ checked: number; relayed: number; txs: number; ms: { select: number; fetch: number; write: number } }> {
   const t0 = Date.now();
@@ -118,14 +141,7 @@ export async function enrichRelays(db: DB, limit = 500, sinceTs = 0): Promise<{ 
 
   const entries = [...byTx];
   const t1 = Date.now();
-  const receipts = new Map<string, { logs: RawLog[] } | null>();
-  let next = 0;
-  await Promise.all(Array.from({ length: RELAY_PARALLEL }, async () => {
-    while (next < entries.length) {
-      const tx = entries[next++]![0];
-      receipts.set(tx, await rpc<{ logs: RawLog[] } | null>('eth_getTransactionReceipt', [tx]));
-    }
-  }));
+  const receipts = await fetchReceipts(entries.map(e => e[0]));
   const t2 = Date.now();
   const relayed = applyReceipts(db, entries, receipts);
   return { checked: pending.length, relayed, txs: entries.length, ms: { select: t1 - t0, fetch: t2 - t1, write: Date.now() - t2 } };
@@ -171,7 +187,8 @@ export function relayRouters(db: DB): string[] {
   return rows.map(r => r.cp);
 }
 
-const RECEIPT_BATCH = 30;
+const RELAY_SKIP_FROM = 1789516800;
+const RELAY_SKIP_TO = 1789603200;
 
 export async function enrichRelayHistory(db: DB, routers: string[], limit = 600): Promise<{ checked: number; relayed: number; left: number }> {
   if (!routers.length) return { checked: 0, relayed: 0, left: 0 };
@@ -180,18 +197,14 @@ export async function enrichRelayHistory(db: DB, routers: string[], limit = 600)
      FROM transfers x JOIN wallets w ON w.id = x.wallet_id
      LEFT JOIN relay_checks r ON r.tx_hash = x.tx_hash AND r.wallet_id = x.wallet_id AND r.token = x.token
      WHERE x.counterparty IN (SELECT value FROM json_each(?)) AND x.token != ? AND r.tx_hash IS NULL
+       AND NOT (x.ts >= ? AND x.ts < ?)
      ORDER BY x.block DESC LIMIT ?`,
-  ).all(JSON.stringify(routers), USDC, limit) as Pending[];
+  ).all(JSON.stringify(routers), USDC, RELAY_SKIP_FROM, RELAY_SKIP_TO, limit) as Pending[];
   const byTx = new Map<string, Pending[]>();
   for (const p of pending) (byTx.get(p.tx_hash) ?? byTx.set(p.tx_hash, []).get(p.tx_hash)!).push(p);
   const entries = [...byTx];
-  const receipts = new Map<string, { logs: RawLog[] } | null | undefined>();
-  for (let i = 0; i < entries.length; i += RECEIPT_BATCH) {
-    const part = entries.slice(i, i + RECEIPT_BATCH).map(e => e[0]);
-    const res = await rpcBatch<{ logs: RawLog[] } | null>('eth_getTransactionReceipt', part.map(tx => [tx]));
-    part.forEach((tx, j) => receipts.set(tx, res[j]));
-  }
+  const receipts = await fetchReceipts(entries.map(e => e[0]));
   const relayed = applyReceipts(db, entries, receipts);
   const got = entries.filter(([tx]) => receipts.get(tx)).length;
-  return { checked: got, relayed, left: got > 0 && pending.length === limit ? 1 : 0 };
+  return { checked: got, relayed, left: pending.length === limit ? 1 : 0 };
 }

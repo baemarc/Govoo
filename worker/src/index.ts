@@ -16,7 +16,8 @@ import { publish, reportError } from './publish.js';
 const ROUND_MS = 5 * 60_000;
 const LIVE_STEP = 5000;
 const BACKFILL_STEPS_PER_ROUND = 20;
-const WHALE_SCAN = false;
+const WHALE_SCAN = true;
+let roundRunning = false;
 const EVERY: Record<string, number> = { tokenBalances: 3600, holders: 4 * 3600, smart: 86_400 };
 
 const log = (...a: unknown[]) => console.log(new Date().toISOString(), ...a);
@@ -96,9 +97,15 @@ async function round(db: DB): Promise<void> {
 
 async function candidateLoop(db: DB): Promise<void> {
   let routers: string[] | null = null;
+  let routersAt = 0;
   for (;;) {
     let busy = false;
     try {
+      if (roundRunning) { busy = true; continue; }
+      if (!routers || now() - routersAt > 6 * 3600) { routers = relayRouters(db); routersAt = now(); }
+      const r = await enrichRelayHistory(db, routers);
+      if (r.checked) log('relay history:', r);
+      if (r.left > 0) { busy = true; continue; }
       const c = await candidateRound(db, 20);
       if (c.added || c.behind || c.pending) log('candidates:', c);
       const w = await walletScanStep(db, c.behind === 0 && c.pending === 0);
@@ -108,16 +115,11 @@ async function candidateLoop(db: DB): Promise<void> {
         log('candidate wallet scan done: smart round brought forward');
       }
       busy = c.behind > 0 || c.pending > 0 || (!!w && !w.done);
-      if (!busy) {
-        routers ??= relayRouters(db);
-        const r = await enrichRelayHistory(db, routers);
-        if (r.checked) log('relay history:', r);
-        busy = r.left > 0;
-      }
     } catch (e) {
       log('candidate loop error:', e);
+    } finally {
+      await new Promise(r => setTimeout(r, busy ? 1000 : ROUND_MS));
     }
-    await new Promise(r => setTimeout(r, busy ? 1000 : ROUND_MS));
   }
 }
 
@@ -129,10 +131,13 @@ async function main(): Promise<void> {
   for (;;) {
     const started = Date.now();
     try {
+      roundRunning = true;
       await round(db);
     } catch (e) {
       log('round error:', e);
       if (process.env.SUPABASE_URL) await reportError(e);
+    } finally {
+      roundRunning = false;
     }
     await new Promise(r => setTimeout(r, Math.max(10_000, ROUND_MS - (Date.now() - started))));
   }
