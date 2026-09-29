@@ -198,7 +198,7 @@ export function TokenLogo({ t, size = 32, glow = false }: { t: Token | undefined
 
 export function TokenCell({ t, address, sub = true }: { t: Token | undefined; address: string; sub?: boolean }) {
   return (
-    <Link to={`/token/${address}`} className="group/tok flex min-w-0 items-center gap-3">
+    <Link to={`/token/${address}`} className="group/tok inline-flex min-w-0 max-w-full items-center gap-3 align-middle">
       <TokenLogo t={t} />
       <div className="min-w-0">
         <div className="truncate font-semibold tracking-tight text-ink transition-colors group-hover/tok:text-accent">{t?.symbol ?? short(address)}</div>

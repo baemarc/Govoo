@@ -1,5 +1,5 @@
 import { Fragment, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { sb } from '../lib/supabase';
 import { fetchAll, must, tokensFor } from '../lib/data';
 import { useAsync } from '../lib/useAsync';
@@ -237,7 +237,8 @@ export default function Board() {
 
         <ul className="md:hidden">
           {shown.map((r, i) => (
-            <MobileRow key={r.token} r={r} i={i} t={tokens.data?.get(r.token)} maxNet={maxNet} holderWin={holderWin} win={win} />
+            <MobileRow key={r.token} r={r} i={i} t={tokens.data?.get(r.token)} maxNet={maxNet} holderWin={holderWin} win={win} winLabel={winLabel}
+              isOpen={open === r.token} toggle={() => setOpen(o => (o === r.token ? null : r.token))} />
           ))}
         </ul>
 
@@ -474,27 +475,31 @@ function Fact({ k, v, warn, hint }: { k: string; v: string; warn?: boolean; hint
   );
 }
 
-function MobileRow({ r, i, t, maxNet, holderWin, win }: {
-  r: BoardRow; i: number; t: Token | undefined; maxNet: number; holderWin: boolean; win: string;
+function MobileRow({ r, i, t, maxNet, holderWin, win, winLabel, isOpen, toggle }: {
+  r: BoardRow; i: number; t: Token | undefined; maxNet: number; holderWin: boolean; win: string; winLabel: string;
+  isOpen: boolean; toggle: () => void;
 }) {
-  const nav = useNavigate();
   return (
-    <li className="rise cursor-pointer border-t border-white/[0.05] px-5 py-4 active:bg-white/[0.03]" style={{ '--i': Math.min(i, 10) } as CSSProperties}
-      onClick={e => { if (!(e.target as HTMLElement).closest('a,button')) nav(`/token/${r.token}?w=${win}`); }}>
-      <div className="flex items-center gap-3">
-        <Rank n={i + 1} active={false} />
-        <div className="min-w-0 flex-1"><TokenCell t={t} address={r.token} /></div>
-        <div className="text-right">
-          <div className={`num font-semibold ${tone(r.net)}`}>{usd(r.net, true)}</div>
-          <div className="num mt-0.5 text-[11px] text-ink-3">{price(t?.price_usd)}</div>
+    <li className={`rise border-t border-white/[0.05] ${isOpen ? 'bg-white/[0.035]' : ''}`} style={{ '--i': Math.min(i, 10) } as CSSProperties}>
+      <div role="button" tabIndex={0} aria-expanded={isOpen} className="cursor-pointer px-5 py-4 outline-none active:bg-white/[0.03] focus-visible:bg-white/[0.03]"
+        onClick={e => { if (!(e.target as HTMLElement).closest('a,button')) toggle(); }}
+        onKeyDown={e => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(); } }}>
+        <div className="flex items-center gap-3">
+          <Rank n={i + 1} active={isOpen} />
+          <div className="min-w-0 flex-1"><TokenCell t={t} address={r.token} /></div>
+          <div className="text-right">
+            <div className={`num font-semibold ${tone(r.net)}`}>{usd(r.net, true)}</div>
+            <div className="num mt-0.5 text-[11px] text-ink-3">{price(t?.price_usd)}</div>
+          </div>
+        </div>
+        <div className="mt-3"><NetBar v={r.net} max={maxNet} i={i} /></div>
+        <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+          <MiniStat k="In / Out"><span className="text-up">{usd(r.inflow)}</span><span className="text-ink-3">/</span><span className="text-down">{usd(r.outflow)}</span></MiniStat>
+          <MiniStat k="Buy / Sell"><span className="text-up">{r.buyers}</span><span className="text-ink-3">/</span><span className="text-down">{r.sellers}</span></MiniStat>
+          <MiniStat k="Holders">{r.holders} {holderWin && <Delta v={r.holders_delta} />}</MiniStat>
         </div>
       </div>
-      <div className="mt-3"><NetBar v={r.net} max={maxNet} i={i} /></div>
-      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-        <MiniStat k="In / Out"><span className="text-up">{usd(r.inflow)}</span><span className="text-ink-3">/</span><span className="text-down">{usd(r.outflow)}</span></MiniStat>
-        <MiniStat k="Buy / Sell"><span className="text-up">{r.buyers}</span><span className="text-ink-3">/</span><span className="text-down">{r.sellers}</span></MiniStat>
-        <MiniStat k="Holders">{r.holders} {holderWin && <Delta v={r.holders_delta} />}</MiniStat>
-      </div>
+      {isOpen && <div className="border-t border-white/[0.04] bg-white/[0.02]"><Detail r={r} t={t} win={win} holderWin={holderWin} winLabel={winLabel} /></div>}
     </li>
   );
 }
