@@ -1,9 +1,9 @@
 {
-  "name": "sonarc-worker",
+  "name": "govoo-worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Sonarc worker",
+  "description": "Govoo worker",
   "engines": {
     "node": ">=20"
   },

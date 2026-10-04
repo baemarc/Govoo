@@ -14,7 +14,7 @@ export default function About() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <PageHead title="Methodology"
-        desc="Sonarc reads token transfers on Arc mainnet, works out each tracked wallet's buys and sells, and sums them per token over nine time windows, from 15 minutes to a month. Token data is kept, not reset every 24 hours." />
+        desc="Govoo reads token transfers on Arc mainnet, works out each tracked wallet's buys and sells, and sums them per token over nine time windows, from 15 minutes to a month. Token data is kept, not reset every 24 hours." />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Status i={1} label="Last update">
@@ -53,7 +53,7 @@ export default function About() {
         </ol>
       </Panel>
 
-      <p className="text-xs text-ink-3">Nothing here is financial advice. Sonarc is a statistics tool, not a signal service.</p>
+      <p className="text-xs text-ink-3">Nothing here is financial advice. Govoo is a statistics tool, not a signal service.</p>
     </div>
   );
 }

@@ -24,5 +24,5 @@ export function num(name: string): number {
 
 export const env = {
   rpcUrls: (optional('ARC_RPC_URL') ?? 'https://rpc.mainnet.arc.io').split(',').map(s => s.trim()),
-  dbPath: path.resolve(WORKER_DIR, optional('SONARC_DB') ?? './data/sonarc.db'),
+  dbPath: path.resolve(WORKER_DIR, optional('GOVOO_DB') ?? './data/govoo.db'),
 };

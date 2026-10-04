@@ -1,8 +1,8 @@
-# Sonarc
+# Govoo
 
 Smart money flow tracker for Arc mainnet.
 
-Sonarc follows a set of tracked wallets (smart, whale, fomo), decodes their on-chain trades
+Govoo follows a set of tracked wallets (smart, whale, fomo), decodes their on-chain trades
 and shows how much money flows into and out of each token across several time windows.
 
 The repository contains the application only. Tracked wallet lists and data are not included.
@@ -42,7 +42,7 @@ cp .env.example .env
 Fill in `.env` at the repository root:
 
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`: from your Supabase project settings.
-- `SONARC_HMAC_KEY`: any long random string.
+- `GOVOO_HMAC_KEY`: any long random string.
 - Rule thresholds (`MIN_TRADE_USD`, `SMART_*`, `BOT_*`, `SYBIL_*`, `CAND_*`, `WHALE_*`,
   `DS_PREFER_RATIO`): these have no defaults. Choose your own values. The worker will not
   start until all of them are set.

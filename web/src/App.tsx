@@ -24,7 +24,7 @@ export default function App() {
         <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:gap-8 sm:px-6">
           <NavLink to="/" className="flex items-center gap-3">
             <SonarMark className="size-8" />
-            <span className="hidden text-[17px] font-semibold tracking-[-0.03em] sm:inline">Sonarc</span>
+            <span className="hidden text-[17px] font-semibold tracking-[-0.03em] sm:inline">Govoo</span>
           </NavLink>
           <nav className="flex gap-0.5 sm:gap-1">
             {nav.map(n => (
@@ -59,7 +59,7 @@ export default function App() {
       </main>
       <footer className="border-t border-white/[0.05]">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-ink-3 sm:px-6">
-          <span className="flex items-center gap-2.5"><SonarMark className="size-5" /> Sonarc · Smart money flows on Arc</span>
+          <span className="flex items-center gap-2.5"><SonarMark className="size-5" /> Govoo · Smart money flows on Arc</span>
           <span>Refreshes every 5 minutes · Not financial advice</span>
         </div>
       </footer>

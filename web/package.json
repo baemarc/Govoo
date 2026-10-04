@@ -1,9 +1,9 @@
 {
-  "name": "sonarc-web",
+  "name": "govoo-web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Sonarc frontend",
+  "description": "Govoo frontend",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

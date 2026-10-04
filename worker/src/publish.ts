@@ -120,7 +120,7 @@ async function sweepRemoved(local: Set<number>): Promise<number> {
 }
 
 export async function publish(db: DB, lastBlock: number): Promise<{ trades: number; board: number }> {
-  const key = required('SONARC_HMAC_KEY');
+  const key = required('GOVOO_HMAC_KEY');
   const t = now();
   await applyAdmin(db);
 
