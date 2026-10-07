@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { configured } from './lib/supabase';
-import { SonarMark } from './components/ui';
+import { GovooMark, GovooWordmark } from './components/ui';
 import Board from './pages/Board';
 import TokenPage from './pages/Token';
 import Flows from './pages/Flows';
@@ -23,8 +23,8 @@ export default function App() {
       <header className="sticky top-0 z-40 border-b border-white/[0.05] bg-bg/60 backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:gap-8 sm:px-6">
           <NavLink to="/" className="flex items-center gap-3">
-            <SonarMark className="size-8" />
-            <span className="hidden text-[17px] font-semibold tracking-[-0.03em] sm:inline">Govoo</span>
+            <GovooMark className="h-5 sm:hidden" />
+            <GovooWordmark className="hidden text-[34px] text-ink sm:inline-flex" />
           </NavLink>
           <nav className="flex gap-0.5 sm:gap-1">
             {nav.map(n => (
@@ -59,7 +59,7 @@ export default function App() {
       </main>
       <footer className="border-t border-white/[0.05]">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-ink-3 sm:px-6">
-          <span className="flex items-center gap-2.5"><SonarMark className="size-5" /> Govoo · Smart money flows on Arc</span>
+          <span className="flex items-center gap-2.5"><GovooMark className="h-3" /> Govoo · Smart money flows on Arc</span>
           <span>Refreshes every 5 minutes · Not financial advice</span>
         </div>
       </footer>

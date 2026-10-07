@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Cat, Token } from '../lib/types';
 import { age } from '../lib/format';
@@ -299,7 +299,7 @@ export function Status({ loading, error, empty, rows = 5 }: { loading?: boolean;
   if (empty) {
     return (
       <div className="flex flex-col items-center gap-3 px-5 py-14 text-center text-sm text-ink-3">
-        <SonarMark className="size-10 opacity-50" />
+        <GovooMark className="w-12 opacity-50" />
         {empty}
       </div>
     );
@@ -307,19 +307,41 @@ export function Status({ loading, error, empty, rows = 5 }: { loading?: boolean;
   return null;
 }
 
-export function SonarMark({ className = '' }: { className?: string }) {
+function Eyes({ g }: { g: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="sm-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5eead4" /><stop offset="1" stopColor="#818cf8" /></linearGradient>
-        <radialGradient id="sm-sweep" cx="16" cy="16" r="11" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#5eead4" stopOpacity="0" /><stop offset="1" stopColor="#5eead4" stopOpacity=".55" /></radialGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="#10131b" />
-      <circle cx="16" cy="16" r="11" fill="none" stroke="url(#sm-ring)" strokeWidth={2} />
-      <circle cx="16" cy="16" r="5.5" fill="none" stroke="url(#sm-ring)" strokeWidth={1.6} opacity=".45" />
-      <path d="M16 16L16 5A11 11 0 0 1 26.4 12.4Z" fill="url(#sm-sweep)" />
-      <circle cx="21.5" cy="10" r="2" fill="#5eead4" />
+    <>
+      <circle cx="168" cy="168" r="136.5" fill="none" stroke={`url(#${g})`} strokeWidth={63} />
+      <circle cx="463" cy="168" r="136.5" fill="none" stroke={`url(#${g})`} strokeWidth={63} />
+      <circle cx="207" cy="134" r="51" fill={`url(#${g})`} />
+      <circle cx="502" cy="134" r="51" fill={`url(#${g})`} />
+    </>
+  );
+}
+
+function EyesGradient({ g }: { g: string }) {
+  return (
+    <linearGradient id={g} x1="0" y1="0" x2="631" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stopColor="#5eead4" /><stop offset="1" stopColor="#818cf8" />
+    </linearGradient>
+  );
+}
+
+export function GovooMark({ className = '' }: { className?: string }) {
+  const g = useId();
+  return (
+    <svg viewBox="0 0 631 336" className={className} aria-hidden>
+      <defs><EyesGradient g={g} /></defs>
+      <Eyes g={g} />
     </svg>
+  );
+}
+
+export function GovooWordmark({ className = '' }: { className?: string }) {
+  return (
+    <span className={`items-baseline font-bold leading-none tracking-[-0.045em] ${className}`} role="img" aria-label="Govoo">
+      <span aria-hidden>Gov</span>
+      <GovooMark className="ml-[0.03em] h-[0.6em]" />
+    </span>
   );
 }
 
