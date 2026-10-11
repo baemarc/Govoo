@@ -20,6 +20,7 @@ export function tokenUniverse(db: DB): string[] {
 }
 
 const HOT_LIQ = 1000;
+const MIN_PRICE_LIQ = 100;
 const DS_CHECK_PER_ROUND = Number(process.env.DS_CHECK_PER_ROUND ?? 300);
 const DS_NOQUOTE_PER_ROUND = Number(process.env.DS_NOQUOTE_PER_ROUND ?? 600);
 const UNPRICED_RETRY = 86_400;
@@ -53,7 +54,7 @@ export async function priceRound(db: DB): Promise<{ tokens: number; asked: numbe
   savePoolReads(db, reads);
   const created = new Map(pools.map(p => [p.id, p.ts]));
   const byToken = new Map<string, PoolRead[]>();
-  for (const r of reads) if (r.liquidityUsd > 0) (byToken.get(r.token) ?? byToken.set(r.token, []).get(r.token)!).push(r);
+  for (const r of reads) if (r.liquidityUsd >= MIN_PRICE_LIQ) (byToken.get(r.token) ?? byToken.set(r.token, []).get(r.token)!).push(r);
 
   const quotes = new Map<string, Quote>();
   for (const [token, rs] of byToken) {
@@ -82,7 +83,7 @@ export async function priceRound(db: DB): Promise<{ tokens: number; asked: numbe
   let dex = 0;
   for (const t of dsPrice) {
     const m = markets.get(t);
-    if (!m || m.priceUsd == null) continue;
+    if (!m || m.priceUsd == null || (m.liquidityUsd ?? 0) < MIN_PRICE_LIQ) continue;
     quotes.set(t, { token: t, priceUsd: m.priceUsd, mcapUsd: m.mcapUsd, liquidityUsd: m.liquidityUsd, pool: null, createdAt: m.pairCreatedAt });
     dex++;
   }
