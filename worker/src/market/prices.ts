@@ -81,9 +81,11 @@ export async function priceRound(db: DB): Promise<{ tokens: number; asked: numbe
   dsCheck.push(...noQuote);
   const markets = await fetchMarkets([...new Set([...dsPrice, ...dsCheck])]);
   let dex = 0;
+  const shallow = new Set<string>();
   for (const t of dsPrice) {
     const m = markets.get(t);
-    if (!m || m.priceUsd == null || (m.liquidityUsd ?? 0) < MIN_PRICE_LIQ) continue;
+    if (!m || m.priceUsd == null) continue;
+    if ((m.liquidityUsd ?? 0) < MIN_PRICE_LIQ) { shallow.add(t); continue; }
     quotes.set(t, { token: t, priceUsd: m.priceUsd, mcapUsd: m.mcapUsd, liquidityUsd: m.liquidityUsd, pool: null, createdAt: m.pairCreatedAt });
     dex++;
   }
@@ -130,7 +132,7 @@ export async function priceRound(db: DB): Promise<{ tokens: number; asked: numbe
     }
     for (const a of ask) {
       if (quotes.has(a)) { if (clearUnpriced.run(a).changes) redo.run(t, a, t - MONTH); continue; }
-      if (addedOrPrefer.has(a) || prefer.has(a) || !dsFresh.get(a, t - 86_400)) continue;
+      if (!shallow.has(a) && (addedOrPrefer.has(a) || prefer.has(a) || !dsFresh.get(a, t - 86_400))) continue;
       unpriced += markUnpriced.run(t, a).changes;
     }
   })();
