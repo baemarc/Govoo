@@ -7,7 +7,7 @@ export function useCountUp(target: number, ms = 900): number {
   const cur = useRef(0);
   useEffect(() => {
     if (!Number.isFinite(target)) return;
-    if (reduced()) { cur.current = target; setV(target); return; }
+    if (reduced() || document.hidden) { cur.current = target; setV(target); return; }
     const from = cur.current, start = performance.now();
     let raf = 0;
     const tick = (now: number) => {
