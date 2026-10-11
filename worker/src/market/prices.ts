@@ -109,9 +109,12 @@ export async function priceRound(db: DB): Promise<{ tokens: number; asked: numbe
   const clearUnpriced = db.prepare(`UPDATE tokens SET unpriced_at = NULL WHERE address = ? AND unpriced_at IS NOT NULL`);
   const redo = db.prepare(`UPDATE trades SET dirty_at = ? WHERE token = ? AND ts > ?`);
   const markUnpriced = db.prepare(`UPDATE tokens SET unpriced_at = ? WHERE address = ?`);
+  const clearShallow = db.prepare(
+    `UPDATE prices SET price_usd = NULL, mcap_usd = NULL WHERE price_usd IS NOT NULL AND coalesce(liquidity_usd, 0) < ?`);
   const addedOrPrefer = new Set<string>();
   let addedPools = 0, preferred = 0, unpriced = 0;
   db.transaction(() => {
+    clearShallow.run(MIN_PRICE_LIQ);
     for (const q of quotes.values()) {
       const d = t - 86_400;
       const prev = ago.get(q.token, d - 3600, d + 3600, d) as { price_usd: number } | undefined;
